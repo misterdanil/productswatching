@@ -30,7 +30,14 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 		org.springframework.data.mongodb.core.query.Query query = new org.springframework.data.mongodb.core.query.Query();
 
 		if (brands != null && !brands.isEmpty()) {
-			query.addCriteria(Criteria.where("characteristics.brand").in(brands));
+			List<Criteria> criteries = new ArrayList<>();
+
+			for (int i = 0; i < brands.size(); i++) {
+				criteries.add(Criteria.where("characteristics.brand")
+						.regex(Pattern.compile(Pattern.quote(brands.get(i)), Pattern.CASE_INSENSITIVE)));
+			}
+			
+			query.addCriteria(new Criteria().orOperator(criteries));
 		}
 		if (start != null) {
 			query.skip(start);
